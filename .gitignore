@@ -1,0 +1,37 @@
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Local database ---------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Node -------------------------------------------------------------------
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# --- Environment (never commit real secrets) --------------------------------
+.env
+.env.*
+!.env.example
+
+# --- Demo recording ---------------------------------------------------------
+demo/.recording/
+
+# --- Local tool settings ----------------------------------------------------
+.claude/settings.local.json
+
+# --- Editors and OS ---------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

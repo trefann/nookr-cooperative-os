@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Nookr design tokens
+
+   One restrained palette, one type scale, one elevation scale. Every screen
+   is built from these, so the product reads as a single system rather than a
+   collection of pages.
+   ========================================================================== */
+
+@theme {
+  /* Brand: a deep, serious navy-blue. Used for structure and primary action. */
+  --color-brand-50: #eef4fb;
+  --color-brand-100: #d6e4f5;
+  --color-brand-200: #adc8ea;
+  --color-brand-300: #7ba5da;
+  --color-brand-400: #4a7fc4;
+  --color-brand-500: #2b62a8;
+  --color-brand-600: #1e4d8c;
+  --color-brand-700: #163d73;
+  --color-brand-800: #12325e;
+  --color-brand-900: #0f2a4d;
+
+  /* Accent: a muted cooperative green. Used for positive states and welfare. */
+  --color-accent-50: #ecf8f2;
+  --color-accent-100: #d2efe1;
+  --color-accent-200: #a6dfc4;
+  --color-accent-300: #6fc9a1;
+  --color-accent-400: #43b083;
+  --color-accent-500: #2a9469;
+  --color-accent-600: #1f7754;
+  --color-accent-700: #1a5f45;
+  --color-accent-800: #164c38;
+  --color-accent-900: #123e2e;
+
+  /* Status */
+  --color-warn-50: #fef6ec;
+  --color-warn-100: #fbe8cd;
+  --color-warn-500: #c2790d;
+  --color-warn-600: #9d6109;
+  --color-warn-700: #7c4d09;
+
+  --color-danger-50: #fdeeee;
+  --color-danger-100: #fad7d7;
+  --color-danger-500: #c8433d;
+  --color-danger-600: #a83430;
+  --color-danger-700: #872a27;
+
+  /* Neutrals: warm-tinted greys so large white areas do not look clinical. */
+  --color-ink-50: #f7f8fa;
+  --color-ink-100: #eef0f4;
+  --color-ink-200: #e0e4ea;
+  --color-ink-300: #c8ced9;
+  --color-ink-400: #98a1b2;
+  --color-ink-500: #6b7488;
+  --color-ink-600: #4d5566;
+  --color-ink-700: #383f4d;
+  --color-ink-800: #262c37;
+  --color-ink-900: #171b23;
+
+  --font-sans:
+    'Inter var', 'Inter', ui-sans-serif, -apple-system, 'Segoe UI Variable Text',
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Nirmala UI', 'Noto Sans',
+    'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu', sans-serif;
+  --font-mono:
+    ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'JetBrains Mono', Menlo,
+    Consolas, monospace;
+
+  --radius-card: 0.875rem;
+
+  --shadow-card: 0 1px 2px rgb(23 27 35 / 0.04), 0 1px 3px rgb(23 27 35 / 0.06);
+  --shadow-raised: 0 2px 4px rgb(23 27 35 / 0.05), 0 8px 20px rgb(23 27 35 / 0.08);
+  --shadow-overlay: 0 12px 32px rgb(23 27 35 / 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-800 font-sans antialiased;
+    /* Never allow a page to scroll sideways on a phone. */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-ink-900 font-semibold tracking-[-0.011em];
+    text-wrap: balance;
+  }
+
+  /* A single, consistent focus treatment across every interactive element. */
+  :focus-visible {
+    @apply outline-brand-500 outline-2 outline-offset-2;
+  }
+
+  /* Charts and tables are allowed to scroll inside their own container. */
+  table {
+    @apply w-full border-collapse;
+  }
+
+  ::selection {
+    @apply bg-brand-100 text-brand-900;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utilities used across screens
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  .card {
+    @apply bg-white border-ink-200 rounded-[var(--radius-card)] border shadow-[var(--shadow-card)];
+  }
+
+  .card-hover {
+    @apply transition-shadow duration-200 hover:shadow-[var(--shadow-raised)];
+  }
+
+  /* Horizontal scroll container: the element scrolls, the page never does. */
+  .scroll-x {
+    @apply -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0;
+    scrollbar-width: thin;
+  }
+
+  .label {
+    @apply text-ink-600 text-xs font-medium tracking-wide uppercase;
+  }
+
+  .metric {
+    @apply text-ink-900 text-3xl font-semibold tracking-[-0.02em] tabular-nums;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Motion: restrained, and switched off entirely when the reader asks.
+   -------------------------------------------------------------------------- */
+
+@keyframes nookr-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nookr-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(42 148 105 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgb(42 148 105 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(42 148 105 / 0);
+  }
+}
+
+.animate-fade-up {
+  animation: nookr-fade-up 0.28s ease-out both;
+}
+
+.animate-live {
+  animation: nookr-pulse-ring 2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Recharts: keep its focus rings from fighting ours. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}
