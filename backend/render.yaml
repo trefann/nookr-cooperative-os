@@ -1,0 +1,63 @@
+# Render Blueprint for the Nookr API.
+#
+# Deploy: on render.com choose "New +" -> "Blueprint", point it at this
+# repository, and Render reads this file to provision everything below in
+# one pass - a web service plus a managed Postgres database, wired together.
+#
+# Free-tier notes, so nothing here is a surprise later:
+#   - The free Postgres database is deleted 30 days after creation. Fine for
+#     a hackathon timeline; for anything longer-lived, swap DATABASE_URL to a
+#     Supabase connection string (see README) - no code change needed, the
+#     backend normalises postgres:// / postgresql:// URLs automatically.
+#   - The free web service spins down after ~15 minutes idle and takes
+#     30-50s to wake on the next request. The first hit after a quiet spell
+#     will look slow, not broken.
+
+databases:
+  - name: nookr-db
+    plan: free
+    databaseName: nookr
+    user: nookr
+
+services:
+  - type: web
+    name: nookr-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: >-
+      alembic upgrade head &&
+      python -m app.db.seed &&
+      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nookr-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "720"
+      - key: ENVIRONMENT
+        value: production
+      - key: COOPERATIVE_TIMEZONE
+        value: Asia/Kolkata
+      # Update this if the Vercel URL changes, and add any preview domains
+      # you need - this app matches origins exactly, no wildcards.
+      - key: CORS_ORIGINS
+        value: https://nookr-drab.vercel.app
+      - key: DEMO_PASSWORD
+        value: demo1234
+      # Optional: set this in the Render dashboard to enable the LLM path
+      # for AI #1. Leave unset and the built-in rule engine is used - the
+      # product is fully functional either way.
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        value: claude-sonnet-5
+      - key: AI_BASE_URL
+        value: https://api.anthropic.com

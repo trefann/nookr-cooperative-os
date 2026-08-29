@@ -36,6 +36,21 @@ class Settings(BaseSettings):
     # requirement for live judging.
     database_url: str = Field(default="sqlite:///./nookr.db")
 
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def _normalise_postgres_scheme(cls, value: str) -> str:
+        """Managed Postgres providers (Render, Supabase, Heroku-style) hand
+        back a bare ``postgres://`` or ``postgresql://`` URL. SQLAlchemy needs
+        the driver named explicitly, or it defaults to psycopg2 - which this
+        project doesn't install (psycopg 3 is the pinned driver). Rewriting
+        the scheme here means any of those providers' connection strings can
+        be pasted in unmodified.
+        """
+        for prefix in ("postgres://", "postgresql://"):
+            if value.startswith(prefix) and "+psycopg" not in value.split("://", 1)[0]:
+                return "postgresql+psycopg://" + value[len(prefix):]
+        return value
+
     # --- auth ---------------------------------------------------------------
     jwt_secret: str = Field(default="dev-only-insecure-secret-change-me")
     jwt_algorithm: str = "HS256"
