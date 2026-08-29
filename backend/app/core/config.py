@@ -57,12 +57,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 720
 
     # --- cors ---------------------------------------------------------------
-    cors_origins: list[str] = Field(
-        default_factory=lambda: [
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            "http://localhost:4173",
-        ]
+    # Deliberately typed as a plain str, not list[str]: pydantic-settings
+    # tries to json.loads() env values for list-typed fields before any
+    # field_validator runs, so a plain comma-separated value like
+    # "https://a.example,https://b.example" fails at the settings-source
+    # layer with a SettingsError, never reaching our own parsing. Splitting
+    # happens in the cors_origin_list property below instead.
+    cors_origins: str = Field(
+        default="http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173"
     )
 
     # --- optional LLM -------------------------------------------------------
@@ -74,12 +76,9 @@ class Settings(BaseSettings):
     # --- demo ---------------------------------------------------------------
     demo_password: str = "demo1234"
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def _split_origins(cls, value: object) -> object:
-        if isinstance(value, str):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
-        return value
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
     @property
     def llm_enabled(self) -> bool:
